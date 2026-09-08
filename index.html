@@ -4,139 +4,258 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>My Files</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 <style>
   :root {
-    --paper: #f7f5f1;
-    --ink: #1b1b1f;
-    --muted: #8a8a8e;
-    --accent: #2b6e6e;
-    --accent-dark: #1f4f4f;
-    --line: #ddd8d0;
-    --danger: #b23a3a;
+    --bg-a: #eef0fb;
+    --bg-b: #f8f7ff;
+    --surface: #ffffff;
+    --ink: #171923;
+    --muted: #6b7080;
+    --accent: #4c3bcf;
+    --accent-soft: #eeeafc;
+    --accent-dark: #382cae;
+    --danger: #e2574c;
+    --danger-soft: #fdeceb;
+    --border: #e6e5f2;
+    --shadow-lg: 0 24px 48px -16px rgba(23,25,35,.18), 0 4px 12px rgba(23,25,35,.06);
   }
   * { box-sizing: border-box; }
+  html, body { height: 100%; }
   body {
     margin: 0;
-    background: var(--paper);
+    min-height: 100vh;
+    background: radial-gradient(at 20% 0%, var(--bg-b), var(--bg-a) 65%);
     color: var(--ink);
-    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
     display: flex;
+    align-items: center;
     justify-content: center;
-    padding: 48px 20px;
+    padding: 28px 18px;
   }
-  .card { width: 100%; max-width: 480px; }
-  h1 { font-size: 22px; font-weight: 600; margin: 0 0 4px; }
-  p.sub { color: var(--muted); margin: 0 0 24px; font-size: 14px; }
-  label { display: block; font-size: 13px; color: var(--muted); margin-bottom: 6px; }
+  .card {
+    width: 100%;
+    max-width: 440px;
+    background: var(--surface);
+    border-radius: 22px;
+    box-shadow: var(--shadow-lg);
+    padding: 36px 32px;
+    position: relative;
+  }
+  .brand { display: flex; align-items: center; gap: 12px; margin-bottom: 4px; }
+  .brand-icon {
+    width: 36px; height: 36px; border-radius: 11px;
+    background: var(--accent-soft); color: var(--accent);
+    display: flex; align-items: center; justify-content: center;
+    flex-shrink: 0;
+  }
+  h1 { font-size: 20px; font-weight: 800; letter-spacing: -0.02em; margin: 0; }
+  p.sub { color: var(--muted); margin: 6px 0 28px; font-size: 13.5px; line-height: 1.5; }
+  label { display: block; font-size: 13px; font-weight: 500; color: var(--muted); margin-bottom: 7px; }
   input[type="password"] {
     width: 100%;
-    padding: 10px 12px;
-    border: 1px solid var(--line);
-    border-radius: 6px;
-    background: white;
-    font-size: 14px;
+    padding: 12px 14px;
+    border: 1.5px solid var(--border);
+    border-radius: 12px;
+    background: var(--bg-b);
+    color: var(--ink);
+    font-size: 14.5px;
+    font-family: inherit;
     margin-bottom: 16px;
-    font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+    transition: border-color .15s ease, box-shadow .15s ease;
+  }
+  input[type="password"]:focus {
+    outline: none;
+    border-color: var(--accent);
+    box-shadow: 0 0 0 4px var(--accent-soft);
   }
   button.primary {
     width: 100%;
-    padding: 11px;
+    padding: 12px;
     border: none;
-    border-radius: 6px;
+    border-radius: 12px;
     background: var(--accent);
     color: white;
-    font-size: 15px;
+    font-size: 14.5px;
+    font-family: inherit;
     font-weight: 600;
     cursor: pointer;
-    margin-bottom: 8px;
+    transition: background .15s ease, transform .1s ease, box-shadow .15s ease;
   }
-  button.primary:hover { background: var(--accent-dark); }
+  button.primary:hover { background: var(--accent-dark); transform: translateY(-1px); box-shadow: 0 8px 16px -6px rgba(76,59,207,.45); }
+  button.primary:active { transform: translateY(0); }
+
   #login-error {
+    display: none;
+    align-items: center;
+    gap: 6px;
     color: var(--danger);
     font-size: 13px;
-    margin: -8px 0 12px;
-    display: none;
+    margin: -8px 0 14px;
   }
+
   #setup-view, #login-view, #app-view { display: none; }
+  .animate-in { animation: viewIn .3s ease; }
+  @keyframes viewIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
+
   .dropzone {
-    border: 2px dashed var(--line);
-    border-radius: 10px;
-    padding: 28px;
+    border: 2px dashed var(--border);
+    border-radius: 16px;
+    padding: 30px 20px;
     text-align: center;
     color: var(--muted);
-    margin-bottom: 16px;
+    margin-bottom: 10px;
     cursor: pointer;
+    transition: border-color .2s ease, background .2s ease, transform .15s ease;
   }
-  .dropzone.drag { border-color: var(--accent); color: var(--accent); }
+  .dropzone svg { color: var(--accent); margin-bottom: 8px; }
+  .dropzone .dz-title { font-weight: 600; color: var(--ink); font-size: 14px; }
+  .dropzone .dz-sub { font-size: 12.5px; margin-top: 2px; }
+  .dropzone.drag { border-color: var(--accent); background: var(--accent-soft); transform: scale(1.01); }
   #file-input { display: none; }
+
+  .toast {
+    display: none;
+    align-items: center;
+    gap: 8px;
+    font-size: 13px;
+    font-weight: 500;
+    padding: 10px 14px;
+    border-radius: 12px;
+    margin: 14px 0 4px;
+    background: var(--accent-soft);
+    color: var(--accent-dark);
+  }
+  .toast.toast-error { background: var(--danger-soft); color: var(--danger); }
+  .toast.animate { animation: toastIn .25s ease; }
+  @keyframes toastIn { from { opacity: 0; transform: translateY(-4px); } to { opacity: 1; transform: translateY(0); } }
+
+  .file-list { margin-top: 8px; }
   .file-row {
     display: flex;
     align-items: center;
-    justify-content: space-between;
-    padding: 12px 0;
-    border-bottom: 1px solid var(--line);
+    gap: 12px;
+    padding: 10px 8px;
+    border-radius: 14px;
+    transition: background .15s ease;
   }
-  .file-name { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 13px; word-break: break-all; }
-  .file-size { color: var(--muted); font-size: 12px; margin-top: 2px; }
-  .file-actions a, .file-actions button {
-    padding: 6px 12px;
-    font-size: 13px;
-    margin-left: 8px;
-    display: inline-block;
-    text-decoration: none;
-    border-radius: 6px;
-    border: 1px solid var(--line);
-    background: white;
-    color: var(--ink);
-    cursor: pointer;
+  .file-row:hover { background: var(--bg-b); }
+  .file-icon {
+    width: 38px; height: 38px; border-radius: 11px;
+    background: var(--accent-soft); color: var(--accent);
+    display: flex; align-items: center; justify-content: center;
+    flex-shrink: 0;
   }
-  #upload-status { font-size: 13px; color: var(--muted); margin-bottom: 16px; display: none; }
-  #empty-state { color: var(--muted); font-size: 14px; padding: 24px 0; text-align: center; }
+  .file-info { flex: 1; min-width: 0; }
+  .file-name { font-weight: 600; font-size: 13.5px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .file-size { color: var(--muted); font-size: 12px; margin-top: 1px; }
+  .file-actions { display: flex; gap: 4px; flex-shrink: 0; }
+  .icon-btn {
+    width: 34px; height: 34px; border-radius: 10px;
+    border: none; background: transparent; color: var(--muted);
+    display: flex; align-items: center; justify-content: center;
+    cursor: pointer; text-decoration: none;
+    transition: background .15s ease, color .15s ease;
+  }
+  .icon-btn:hover { background: var(--bg-b); color: var(--ink); }
+  .icon-btn.danger:hover { background: var(--danger-soft); color: var(--danger); }
+
+  #empty-state {
+    display: none;
+    flex-direction: column;
+    align-items: center;
+    color: var(--muted);
+    padding: 32px 0 12px;
+    text-align: center;
+  }
+  #empty-state svg { color: var(--border); margin-bottom: 10px; }
+  #empty-state .es-title { font-weight: 600; color: var(--ink); font-size: 14px; }
+  #empty-state .es-sub { font-size: 12.5px; margin-top: 3px; }
+
   .forget-link {
+    display: block;
     background: transparent;
     border: none;
     color: var(--muted);
-    font-size: 13px;
-    text-decoration: underline;
+    font-size: 12.5px;
+    font-family: inherit;
     cursor: pointer;
-    margin-top: 20px;
+    margin: 22px auto 0;
     padding: 0;
+    text-align: center;
+    width: 100%;
   }
-  .hint { color: var(--muted); font-size: 12px; margin: -10px 0 16px; }
+  .forget-link:hover { color: var(--ink); text-decoration: underline; }
+  .hint { color: var(--muted); font-size: 12px; margin: -10px 0 16px; line-height: 1.5; }
+
+  @media (max-width: 420px) {
+    .card { padding: 28px 22px; border-radius: 18px; }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    * { animation: none !important; transition: none !important; }
+  }
 </style>
 </head>
 <body>
 <div class="card">
 
   <div id="setup-view">
-    <h1>My Files</h1>
+    <div class="brand">
+      <div class="brand-icon">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 19V6M5 12l7-7 7 7"/></svg>
+      </div>
+      <h1>My Files</h1>
+    </div>
     <p class="sub">First time on this device — set it up once.</p>
     <label for="setup-passcode">Choose a passcode</label>
     <input type="password" id="setup-passcode" placeholder="Something only you know">
     <label for="setup-token">Paste your GitHub token (one time)</label>
     <input type="password" id="setup-token" placeholder="github_pat_...">
     <p class="hint">Both are saved only in this browser. You'll enter just the passcode next time.</p>
-    <button class="primary" id="setup-save">Save & continue</button>
+    <button class="primary" id="setup-save">Save &amp; continue</button>
   </div>
 
   <div id="login-view">
-    <h1>My Files</h1>
-    <p class="sub">Enter your passcode.</p>
-    <div id="login-error">Wrong passcode, try again.</div>
+    <div class="brand">
+      <div class="brand-icon">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="10" width="16" height="10" rx="2"/><path d="M8 10V7a4 4 0 018 0v3"/></svg>
+      </div>
+      <h1>My Files</h1>
+    </div>
+    <p class="sub">Enter your passcode to continue.</p>
+    <div id="login-error">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+      Wrong passcode, try again.
+    </div>
     <input type="password" id="login-passcode" placeholder="Passcode">
     <button class="primary" id="login-unlock">Unlock</button>
   </div>
 
   <div id="app-view">
-    <h1>My Files</h1>
+    <div class="brand">
+      <div class="brand-icon">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 19V6M5 12l7-7 7 7"/></svg>
+      </div>
+      <h1>My Files</h1>
+    </div>
     <p class="sub">Upload from one device, download from another.</p>
 
     <input type="file" id="file-input">
-    <div class="dropzone" id="dropzone">Tap to choose a file, or drag one here</div>
-    <div id="upload-status"></div>
+    <div class="dropzone" id="dropzone">
+      <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+      <div class="dz-title">Drop a file here</div>
+      <div class="dz-sub">or tap to choose one</div>
+    </div>
+    <div id="upload-status" class="toast"></div>
 
-    <div id="file-list"></div>
-    <div id="empty-state">No files yet.</div>
+    <div class="file-list" id="file-list"></div>
+    <div id="empty-state">
+      <svg width="34" height="34" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><polyline points="22 12 16 12 14 15 10 15 8 12 2 12"/><path d="M5.45 5.11L2 12v6a2 2 0 002 2h16a2 2 0 002-2v-6l-3.45-6.89A2 2 0 0016.76 4H7.24a2 2 0 00-1.79 1.11z"/></svg>
+      <div class="es-title">Nothing here yet</div>
+      <div class="es-sub">Drop a file above to get started.</div>
+    </div>
 
     <button class="forget-link" id="forget-device">Forget this device</button>
   </div>
@@ -156,18 +275,22 @@
 
   function showView(view) {
     ['setup-view', 'login-view', 'app-view'].forEach(id => {
-      document.getElementById(id).style.display = (id === view) ? 'block' : 'none';
+      const el = document.getElementById(id);
+      if (id === view) {
+        el.style.display = 'block';
+        el.classList.remove('animate-in');
+        void el.offsetWidth;
+        el.classList.add('animate-in');
+      } else {
+        el.style.display = 'none';
+      }
     });
   }
 
   function init() {
     const hasToken = localStorage.getItem('gh_token');
     const hasPasscode = localStorage.getItem('gh_passcode');
-    if (!hasToken || !hasPasscode) {
-      showView('setup-view');
-    } else {
-      showView('login-view');
-    }
+    showView((!hasToken || !hasPasscode) ? 'setup-view' : 'login-view');
   }
 
   document.getElementById('setup-save').addEventListener('click', () => {
@@ -188,7 +311,7 @@
       showView('app-view');
       loadFiles();
     } else {
-      errorBox.style.display = 'block';
+      errorBox.style.display = 'flex';
     }
   });
 
@@ -211,15 +334,19 @@
     if (fileInput.files.length) uploadFile(fileInput.files[0]);
   });
 
-  function showStatus(msg) {
-    uploadStatus.style.display = 'block';
+  function showStatus(msg, type) {
     uploadStatus.textContent = msg;
+    uploadStatus.className = 'toast' + (type === 'error' ? ' toast-error' : '');
+    uploadStatus.style.display = 'flex';
+    uploadStatus.classList.remove('animate');
+    void uploadStatus.offsetWidth;
+    uploadStatus.classList.add('animate');
   }
 
   function uploadFile(file) {
     const token = localStorage.getItem('gh_token');
-    if (!token) { showStatus('No token saved on this device.'); return; }
-    if (file.size > 20 * 1024 * 1024) { showStatus('File is too big for this (keep it under ~20MB).'); return; }
+    if (!token) { showStatus('No token saved on this device.', 'error'); return; }
+    if (file.size > 20 * 1024 * 1024) { showStatus('File is too big for this (keep it under ~20MB).', 'error'); return; }
 
     showStatus(`Uploading ${file.name}...`);
     const reader = new FileReader();
@@ -237,9 +364,9 @@
         if (!res.ok) return res.json().then(d => { throw new Error(d.message || 'Upload failed'); });
         showStatus(`Uploaded ${file.name}`);
         fileInput.value = '';
-        setTimeout(() => { uploadStatus.style.display = 'none'; }, 2000);
+        setTimeout(() => { uploadStatus.style.display = 'none'; }, 2200);
         loadFiles();
-      }).catch(err => showStatus('Upload failed: ' + err.message));
+      }).catch(err => showStatus('Upload failed: ' + err.message, 'error'));
     };
     reader.readAsDataURL(file);
   }
@@ -255,23 +382,33 @@
       .then(res => res.ok ? res.json() : [])
       .then(items => {
         fileList.innerHTML = '';
-        if (!Array.isArray(items) || !items.length) { emptyState.style.display = 'block'; return; }
+        if (!Array.isArray(items) || !items.length) { emptyState.style.display = 'flex'; return; }
         emptyState.style.display = 'none';
         items.slice().reverse().forEach(item => {
           const displayName = item.name.replace(/^\d+_/, '');
           const row = document.createElement('div');
           row.className = 'file-row';
           row.innerHTML = `
-            <div>
+            <div class="file-icon">
+              <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+            </div>
+            <div class="file-info">
               <div class="file-name">${displayName}</div>
               <div class="file-size">${formatSize(item.size)}</div>
             </div>
             <div class="file-actions">
-              <a href="${item.download_url}" download="${displayName}" target="_blank" rel="noopener">Download</a>
-              <button data-path="${item.path}" data-sha="${item.sha}">Delete</button>
+              <a class="icon-btn" href="${item.download_url}" download="${displayName}" target="_blank" rel="noopener" title="Download">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+              </a>
+              <button class="icon-btn danger" data-path="${item.path}" data-sha="${item.sha}" title="Delete">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 01-2 2H8a2 2 0 01-2-2L5 6"/><path d="M10 11v6"/><path d="M14 11v6"/></svg>
+              </button>
             </div>
           `;
-          row.querySelector('button').addEventListener('click', e => deleteFile(e.target.dataset.path, e.target.dataset.sha));
+          row.querySelector('button').addEventListener('click', e => {
+            const btn = e.target.closest('button');
+            deleteFile(btn.dataset.path, btn.dataset.sha);
+          });
           fileList.appendChild(row);
         });
       });
@@ -279,7 +416,7 @@
 
   function deleteFile(path, sha) {
     const token = localStorage.getItem('gh_token');
-    if (!token) { showStatus('No token saved on this device.'); return; }
+    if (!token) { showStatus('No token saved on this device.', 'error'); return; }
     fetch(`https://api.github.com/repos/${OWNER}/${REPO}/contents/${path}`, {
       method: 'DELETE',
       headers: {
