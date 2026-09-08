@@ -1,12 +1,296 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>My Page</title>
-  <textarea id="Test" rows="10" cols="50"></textarea>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>My Files</title>
+<style>
+  :root {
+    --paper: #f7f5f1;
+    --ink: #1b1b1f;
+    --muted: #8a8a8e;
+    --accent: #2b6e6e;
+    --accent-dark: #1f4f4f;
+    --line: #ddd8d0;
+    --danger: #b23a3a;
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    background: var(--paper);
+    color: var(--ink);
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    display: flex;
+    justify-content: center;
+    padding: 48px 20px;
+  }
+  .card { width: 100%; max-width: 480px; }
+  h1 { font-size: 22px; font-weight: 600; margin: 0 0 4px; }
+  p.sub { color: var(--muted); margin: 0 0 24px; font-size: 14px; }
+  label { display: block; font-size: 13px; color: var(--muted); margin-bottom: 6px; }
+  input[type="password"] {
+    width: 100%;
+    padding: 10px 12px;
+    border: 1px solid var(--line);
+    border-radius: 6px;
+    background: white;
+    font-size: 14px;
+    margin-bottom: 16px;
+    font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+  }
+  button.primary {
+    width: 100%;
+    padding: 11px;
+    border: none;
+    border-radius: 6px;
+    background: var(--accent);
+    color: white;
+    font-size: 15px;
+    font-weight: 600;
+    cursor: pointer;
+    margin-bottom: 8px;
+  }
+  button.primary:hover { background: var(--accent-dark); }
+  #login-error {
+    color: var(--danger);
+    font-size: 13px;
+    margin: -8px 0 12px;
+    display: none;
+  }
+  #setup-view, #login-view, #app-view { display: none; }
+  .dropzone {
+    border: 2px dashed var(--line);
+    border-radius: 10px;
+    padding: 28px;
+    text-align: center;
+    color: var(--muted);
+    margin-bottom: 16px;
+    cursor: pointer;
+  }
+  .dropzone.drag { border-color: var(--accent); color: var(--accent); }
+  #file-input { display: none; }
+  .file-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 12px 0;
+    border-bottom: 1px solid var(--line);
+  }
+  .file-name { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 13px; word-break: break-all; }
+  .file-size { color: var(--muted); font-size: 12px; margin-top: 2px; }
+  .file-actions a, .file-actions button {
+    padding: 6px 12px;
+    font-size: 13px;
+    margin-left: 8px;
+    display: inline-block;
+    text-decoration: none;
+    border-radius: 6px;
+    border: 1px solid var(--line);
+    background: white;
+    color: var(--ink);
+    cursor: pointer;
+  }
+  #upload-status { font-size: 13px; color: var(--muted); margin-bottom: 16px; display: none; }
+  #empty-state { color: var(--muted); font-size: 14px; padding: 24px 0; text-align: center; }
+  .forget-link {
+    background: transparent;
+    border: none;
+    color: var(--muted);
+    font-size: 13px;
+    text-decoration: underline;
+    cursor: pointer;
+    margin-top: 20px;
+    padding: 0;
+  }
+  .hint { color: var(--muted); font-size: 12px; margin: -10px 0 16px; }
+</style>
 </head>
 <body>
+<div class="card">
 
+  <div id="setup-view">
+    <h1>My Files</h1>
+    <p class="sub">First time on this device — set it up once.</p>
+    <label for="setup-passcode">Choose a passcode</label>
+    <input type="password" id="setup-passcode" placeholder="Something only you know">
+    <label for="setup-token">Paste your GitHub token (one time)</label>
+    <input type="password" id="setup-token" placeholder="github_pat_...">
+    <p class="hint">Both are saved only in this browser. You'll enter just the passcode next time.</p>
+    <button class="primary" id="setup-save">Save & continue</button>
+  </div>
+
+  <div id="login-view">
+    <h1>My Files</h1>
+    <p class="sub">Enter your passcode.</p>
+    <div id="login-error">Wrong passcode, try again.</div>
+    <input type="password" id="login-passcode" placeholder="Passcode">
+    <button class="primary" id="login-unlock">Unlock</button>
+  </div>
+
+  <div id="app-view">
+    <h1>My Files</h1>
+    <p class="sub">Upload from one device, download from another.</p>
+
+    <input type="file" id="file-input">
+    <div class="dropzone" id="dropzone">Tap to choose a file, or drag one here</div>
+    <div id="upload-status"></div>
+
+    <div id="file-list"></div>
+    <div id="empty-state">No files yet.</div>
+
+    <button class="forget-link" id="forget-device">Forget this device</button>
+  </div>
+
+</div>
+
+<script>
+  const OWNER = 'ekuvend';
+  const REPO = 'html';
+  const FOLDER = 'files';
+
+  const dropzone = document.getElementById('dropzone');
+  const fileInput = document.getElementById('file-input');
+  const uploadStatus = document.getElementById('upload-status');
+  const fileList = document.getElementById('file-list');
+  const emptyState = document.getElementById('empty-state');
+
+  function showView(view) {
+    ['setup-view', 'login-view', 'app-view'].forEach(id => {
+      document.getElementById(id).style.display = (id === view) ? 'block' : 'none';
+    });
+  }
+
+  function init() {
+    const hasToken = localStorage.getItem('gh_token');
+    const hasPasscode = localStorage.getItem('gh_passcode');
+    if (!hasToken || !hasPasscode) {
+      showView('setup-view');
+    } else {
+      showView('login-view');
+    }
+  }
+
+  document.getElementById('setup-save').addEventListener('click', () => {
+    const passcode = document.getElementById('setup-passcode').value.trim();
+    const token = document.getElementById('setup-token').value.trim();
+    if (!passcode || !token) { alert('Fill in both fields.'); return; }
+    localStorage.setItem('gh_passcode', passcode);
+    localStorage.setItem('gh_token', token);
+    showView('app-view');
+    loadFiles();
+  });
+
+  document.getElementById('login-unlock').addEventListener('click', () => {
+    const entered = document.getElementById('login-passcode').value.trim();
+    const errorBox = document.getElementById('login-error');
+    if (entered && entered === localStorage.getItem('gh_passcode')) {
+      errorBox.style.display = 'none';
+      showView('app-view');
+      loadFiles();
+    } else {
+      errorBox.style.display = 'block';
+    }
+  });
+
+  document.getElementById('forget-device').addEventListener('click', () => {
+    if (confirm('Forget this device? You will need your GitHub token again next time.')) {
+      localStorage.clear();
+      location.reload();
+    }
+  });
+
+  dropzone.addEventListener('click', () => fileInput.click());
+  dropzone.addEventListener('dragover', e => { e.preventDefault(); dropzone.classList.add('drag'); });
+  dropzone.addEventListener('dragleave', () => dropzone.classList.remove('drag'));
+  dropzone.addEventListener('drop', e => {
+    e.preventDefault();
+    dropzone.classList.remove('drag');
+    if (e.dataTransfer.files.length) uploadFile(e.dataTransfer.files[0]);
+  });
+  fileInput.addEventListener('change', () => {
+    if (fileInput.files.length) uploadFile(fileInput.files[0]);
+  });
+
+  function showStatus(msg) {
+    uploadStatus.style.display = 'block';
+    uploadStatus.textContent = msg;
+  }
+
+  function uploadFile(file) {
+    const token = localStorage.getItem('gh_token');
+    if (!token) { showStatus('No token saved on this device.'); return; }
+    if (file.size > 20 * 1024 * 1024) { showStatus('File is too big for this (keep it under ~20MB).'); return; }
+
+    showStatus(`Uploading ${file.name}...`);
+    const reader = new FileReader();
+    reader.onload = () => {
+      const base64 = reader.result.split(',')[1];
+      const path = `${FOLDER}/${Date.now()}_${file.name}`;
+      fetch(`https://api.github.com/repos/${OWNER}/${REPO}/contents/${path}`, {
+        method: 'PUT',
+        headers: {
+          'Authorization': `token ${token}`,
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ message: `Upload ${file.name}`, content: base64 })
+      }).then(res => {
+        if (!res.ok) return res.json().then(d => { throw new Error(d.message || 'Upload failed'); });
+        showStatus(`Uploaded ${file.name}`);
+        fileInput.value = '';
+        setTimeout(() => { uploadStatus.style.display = 'none'; }, 2000);
+        loadFiles();
+      }).catch(err => showStatus('Upload failed: ' + err.message));
+    };
+    reader.readAsDataURL(file);
+  }
+
+  function formatSize(bytes) {
+    if (bytes < 1024) return bytes + ' B';
+    if (bytes < 1024 * 1024) return (bytes / 1024).toFixed(1) + ' KB';
+    return (bytes / (1024 * 1024)).toFixed(1) + ' MB';
+  }
+
+  function loadFiles() {
+    fetch(`https://api.github.com/repos/${OWNER}/${REPO}/contents/${FOLDER}`)
+      .then(res => res.ok ? res.json() : [])
+      .then(items => {
+        fileList.innerHTML = '';
+        if (!Array.isArray(items) || !items.length) { emptyState.style.display = 'block'; return; }
+        emptyState.style.display = 'none';
+        items.slice().reverse().forEach(item => {
+          const displayName = item.name.replace(/^\d+_/, '');
+          const row = document.createElement('div');
+          row.className = 'file-row';
+          row.innerHTML = `
+            <div>
+              <div class="file-name">${displayName}</div>
+              <div class="file-size">${formatSize(item.size)}</div>
+            </div>
+            <div class="file-actions">
+              <a href="${item.download_url}" download="${displayName}" target="_blank" rel="noopener">Download</a>
+              <button data-path="${item.path}" data-sha="${item.sha}">Delete</button>
+            </div>
+          `;
+          row.querySelector('button').addEventListener('click', e => deleteFile(e.target.dataset.path, e.target.dataset.sha));
+          fileList.appendChild(row);
+        });
+      });
+  }
+
+  function deleteFile(path, sha) {
+    const token = localStorage.getItem('gh_token');
+    if (!token) { showStatus('No token saved on this device.'); return; }
+    fetch(`https://api.github.com/repos/${OWNER}/${REPO}/contents/${path}`, {
+      method: 'DELETE',
+      headers: {
+        'Authorization': `token ${token}`,
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({ message: `Delete ${path}`, sha })
+    }).then(loadFiles);
+  }
+
+  init();
+</script>
 </body>
 </html>
