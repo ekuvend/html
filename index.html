@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="et">
+<html lang="en">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -7,10 +7,6 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-
-<!-- Supabase Client Library -->
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-
 <style>
   :root {
     --bg-a: #eef0fb;
@@ -50,26 +46,13 @@
     max-width: 760px; margin: 0 auto; padding: 14px 24px;
     display: flex; align-items: center; justify-content: space-between;
   }
-  .brand-name { font-weight: 800; color: var(--ink); text-decoration: none; font-size: 15px; letter-spacing: -0.01em; cursor: pointer; }
-  .nav-links { display: flex; gap: 22px; align-items: center; }
-  .nav-links a, .nav-links button { 
-    color: var(--muted); 
-    text-decoration: none; 
-    font-size: 14px; 
-    font-weight: 500; 
-    transition: color .15s ease; 
-    background: none;
-    border: none;
-    cursor: pointer;
-    font-family: inherit;
-  }
-  .nav-links a:hover, .nav-links button:hover { color: var(--accent); }
+  .brand-name { font-weight: 800; color: var(--ink); text-decoration: none; font-size: 15px; letter-spacing: -0.01em; }
+  .nav-links { display: flex; gap: 22px; }
+  .nav-links a { color: var(--muted); text-decoration: none; font-size: 14px; font-weight: 500; transition: color .15s ease; }
+  .nav-links a:hover { color: var(--accent); }
 
-  /* ---------- Sections / Pages ---------- */
-  .page-view { display: none; }
-  .page-view.active { display: block; }
-
-  .section { max-width: 720px; margin: 0 auto; padding: 56px 24px; }
+  /* ---------- Sections ---------- */
+  .section { max-width: 720px; margin: 0 auto; padding: 56px 24px; scroll-margin-top: 76px; }
   .hero { text-align: center; padding-top: 72px; padding-bottom: 40px; }
   .hero-name { font-size: clamp(32px, 5vw, 44px); font-weight: 800; letter-spacing: -0.02em; margin: 0 0 10px; }
   .hero-tagline { font-size: 17px; font-weight: 500; margin: 0 auto 14px; max-width: 480px; }
@@ -104,12 +87,18 @@
   .project-card h3 { font-size: 15.5px; font-weight: 700; margin: 0 0 6px; }
   .project-card p { font-size: 13.5px; color: var(--muted); line-height: 1.6; margin: 0 0 14px; }
   .project-link { font-size: 13px; font-weight: 600; color: var(--accent); text-decoration: none; }
+  .project-link:hover { text-decoration: underline; }
 
-  /* ---------- Cards & Auth ---------- */
+  /* ---------- Footer ---------- */
+  .footer { text-align: center; padding: 40px 24px 64px; color: var(--muted); font-size: 13px; border-top: 1px solid var(--border); margin-top: 12px; }
+  .footer a { color: var(--accent); text-decoration: none; }
+  .footer a:hover { text-decoration: underline; }
+
+  /* ---------- Files card (unchanged tool) ---------- */
   .card {
     width: 100%;
     max-width: 440px;
-    margin: 40px auto;
+    margin: 0 auto;
     background: var(--surface);
     border-radius: 22px;
     box-shadow: var(--shadow-lg);
@@ -125,9 +114,8 @@
   }
   .card h1 { font-size: 20px; font-weight: 800; letter-spacing: -0.02em; margin: 0; }
   .card p.sub { color: var(--muted); margin: 6px 0 28px; font-size: 13.5px; line-height: 1.5; }
-  
   label { display: block; font-size: 13px; font-weight: 500; color: var(--muted); margin-bottom: 7px; }
-  input[type="text"], input[type="email"], input[type="password"] {
+  input[type="password"] {
     width: 100%;
     padding: 12px 14px;
     border: 1.5px solid var(--border);
@@ -137,10 +125,13 @@
     font-size: 14.5px;
     font-family: inherit;
     margin-bottom: 16px;
-    transition: border-color .15s ease;
+    transition: border-color .15s ease, box-shadow .15s ease;
   }
-  input:focus { outline: none; border-color: var(--accent); }
-  
+  input[type="password"]:focus {
+    outline: none;
+    border-color: var(--accent);
+    box-shadow: 0 0 0 4px var(--accent-soft);
+  }
   button.primary {
     width: 100%;
     padding: 12px;
@@ -152,21 +143,24 @@
     font-family: inherit;
     font-weight: 600;
     cursor: pointer;
-    transition: background .15s ease;
+    transition: background .15s ease, transform .1s ease, box-shadow .15s ease;
   }
-  button.primary:hover { background: var(--accent-dark); }
-  
-  .auth-toggle {
-    margin-top: 16px;
-    text-align: center;
+  button.primary:hover { background: var(--accent-dark); transform: translateY(-1px); box-shadow: 0 8px 16px -6px rgba(76,59,207,.45); }
+  button.primary:active { transform: translateY(0); }
+
+  #login-error {
+    display: none;
+    align-items: center;
+    gap: 6px;
+    color: var(--danger);
     font-size: 13px;
-    color: var(--muted);
-  }
-  .auth-toggle button {
-    background: none; border: none; color: var(--accent); font-weight: 600; cursor: pointer; padding: 0;
+    margin: -8px 0 14px;
   }
 
-  /* ---------- Dropzone & Files ---------- */
+  #setup-view, #login-view, #app-view { display: none; }
+  .animate-in { animation: viewIn .3s ease; }
+  @keyframes viewIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
+
   .dropzone {
     border: 2px dashed var(--border);
     border-radius: 16px;
@@ -175,228 +169,383 @@
     color: var(--muted);
     margin-bottom: 10px;
     cursor: pointer;
+    transition: border-color .2s ease, background .2s ease, transform .15s ease;
   }
+  .dropzone svg { color: var(--accent); margin-bottom: 8px; }
+  .dropzone .dz-title { font-weight: 600; color: var(--ink); font-size: 14px; }
+  .dropzone .dz-sub { font-size: 12.5px; margin-top: 2px; }
+  .dropzone.drag { border-color: var(--accent); background: var(--accent-soft); transform: scale(1.01); }
   #file-input { display: none; }
-  
-  .file-list { margin-top: 16px; }
+
+  .toast {
+    display: none;
+    align-items: center;
+    gap: 8px;
+    font-size: 13px;
+    font-weight: 500;
+    padding: 10px 14px;
+    border-radius: 12px;
+    margin: 14px 0 4px;
+    background: var(--accent-soft);
+    color: var(--accent-dark);
+  }
+  .toast.toast-error { background: var(--danger-soft); color: var(--danger); }
+  .toast.animate { animation: toastIn .25s ease; }
+  @keyframes toastIn { from { opacity: 0; transform: translateY(-4px); } to { opacity: 1; transform: translateY(0); } }
+
+  .file-list { margin-top: 8px; }
   .file-row {
-    display: flex; align-items: center; gap: 12px; padding: 10px 8px; border-radius: 14px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 10px 8px;
+    border-radius: 14px;
+    transition: background .15s ease;
+  }
+  .file-row:hover { background: var(--bg-b); }
+  .file-icon {
+    width: 38px; height: 38px; border-radius: 11px;
+    background: var(--accent-soft); color: var(--accent);
+    display: flex; align-items: center; justify-content: center;
+    flex-shrink: 0;
   }
   .file-info { flex: 1; min-width: 0; }
   .file-name { font-weight: 600; font-size: 13.5px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-  .file-size { color: var(--muted); font-size: 12px; }
+  .file-size { color: var(--muted); font-size: 12px; margin-top: 1px; }
+  .file-actions { display: flex; gap: 4px; flex-shrink: 0; }
+  .icon-btn {
+    width: 34px; height: 34px; border-radius: 10px;
+    border: none; background: transparent; color: var(--muted);
+    display: flex; align-items: center; justify-content: center;
+    cursor: pointer; text-decoration: none;
+    transition: background .15s ease, color .15s ease;
+  }
+  .icon-btn:hover { background: var(--bg-b); color: var(--ink); }
+  .icon-btn.danger:hover { background: var(--danger-soft); color: var(--danger); }
 
-  /* ---------- Footer ---------- */
-  .footer { text-align: center; padding: 40px 24px; color: var(--muted); font-size: 13px; border-top: 1px solid var(--border); margin-top: 40px; }
-  .footer a { color: var(--accent); text-decoration: none; }
+  #empty-state {
+    display: none;
+    flex-direction: column;
+    align-items: center;
+    color: var(--muted);
+    padding: 32px 0 12px;
+    text-align: center;
+  }
+  #empty-state svg { color: var(--border); margin-bottom: 10px; }
+  #empty-state .es-title { font-weight: 600; color: var(--ink); font-size: 14px; }
+  #empty-state .es-sub { font-size: 12.5px; margin-top: 3px; }
+
+  .forget-link {
+    display: block;
+    background: transparent;
+    border: none;
+    color: var(--muted);
+    font-size: 12.5px;
+    font-family: inherit;
+    cursor: pointer;
+    margin: 22px auto 0;
+    padding: 0;
+    text-align: center;
+    width: 100%;
+  }
+  .forget-link:hover { color: var(--ink); text-decoration: underline; }
+  .hint { color: var(--muted); font-size: 12px; margin: -10px 0 16px; line-height: 1.5; }
+
+  @media (max-width: 420px) {
+    .card { padding: 28px 22px; border-radius: 18px; }
+    .nav-links { gap: 14px; }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    * { animation: none !important; transition: none !important; }
+  }
 </style>
 </head>
 <body>
 
 <header class="topnav">
   <div class="topnav-inner">
-    <a onclick="navigateTo('home')" class="brand-name">E.P</a>
+    <a href="#about" class="brand-name">E.P</a>
     <nav class="nav-links">
-      <button onclick="navigateTo('home')">Minust</button>
-      <button onclick="navigateTo('projects')">Projektid</button>
-      <button onclick="navigateTo('files')">Failid</button>
+      <a href="#about">Minust</a>
+      <a href="#projects">Projectid</a>
+      <a href="#files">Failid</a>
     </nav>
   </div>
 </header>
 
 <main>
 
-  <!-- Home / About Page View -->
-  <div id="page-home" class="page-view active">
-    <section class="section hero">
-      <h1 class="hero-name">E.P</h1>
-      <p class="hero-tagline">Passati niinimetatud "tuuner"</p>
-      <p class="hero-bio">1998 aasta passat, syncro, 1.8T, 5ne manuaalkäigukast. Läbisõit on teadmata, vennalt olin saanud selle kui sünnipäeva kingina, et saaksin selle pealt õppida autodest.</p>
-    </section>
-  </div>
+  <section id="about" class="section hero">
+    <h1 class="hero-name">E.P</h1>
+    <p class="hero-tagline">Passati niinimetatud "tuuner"</p>
+    <p class="hero-bio">1998 aasta passat, syncro, 1.8T, 5ne manuaalkäigukast. Läbisõit on teadmata, vennalt olin saanud selle kui sünnipäeva kingina, et saaksin selle pealt õppida autodest.</p>
+  </section>
 
-  <!-- Projects Page View -->
-  <div id="page-projects" class="page-view">
-    <section class="section">
-      <h2 class="section-title">Projektid</h2>
-      <p class="section-sub">Paar asja milleüle uhke olen</p>
-      <div class="project-grid">
-        <article class="project-card">
-          <span class="tag tag-a">Tehtud</span>
-          <h3>Väljalaske süsteem</h3>
-          <p>Katalüsaatorist kuni lõpupütini handmade kõik.</p>
-          <a href="#" class="project-link">Vaata edasi</a>
-        </article>
-      </div>
-    </section>
-  </div>
+  <section id="projects" class="section">
+    <h2 class="section-title">Projectid</h2>
+    <p class="section-sub">Paar asja milleüle uhke olen</p>
+    <div class="project-grid">
+      <article class="project-card">
+        <span class="tag tag-a"></span>
+        <h3>Väljalaske süsteem</h3>
+        <p>Kätalüsaatorist kuni lõpupütini handmade kõik.</p>
+        <a href="#" class="project-link">Vaata edasi</a>
+      </article>
+      <article class="project-card">
+        <span class="tag tag-b"></span>
+        <h3>Project Two</h3>
+        <p>A short description of what this project does and why you built it.</p>
+        <a href="#" class="project-link">View project</a>
+      </article>
+      <article class="project-card">
+        <span class="tag tag-c">Idea</span>
+        <h3>Project Three</h3>
+        <p>A short description of what this project does and why you built it.</p>
+        <a href="#" class="project-link">View project</a>
+      </article>
+    </div>
+  </section>
 
-  <!-- Separate Files Page View -->
-  <div id="page-files" class="page-view">
-    <section class="section">
+  <section id="files" class="section files-section">
+    <h2 class="section-title">Failid</h2>
+    <p class="section-sub">Lae üles või lae alla faile</p>
 
-      <!-- Auth Form (Shown when logged out) -->
-      <div id="auth-container" class="card">
+    <div class="card">
+
+      <div id="setup-view">
         <div class="brand">
-          <div class="brand-icon">🔑</div>
-          <h1 id="auth-title">Logi sisse</h1>
-        </div>
-        <p class="sub" id="auth-sub">Sisesta oma andmed failidele ligipääsuks</p>
-
-        <form id="auth-form" onsubmit="handleAuth(event)">
-          <label for="auth-email">E-mail</label>
-          <input type="email" id="auth-email" required placeholder="kasutaja@e-mail.ee">
-
-          <label for="auth-password">Parool</label>
-          <input type="password" id="auth-password" required placeholder="••••••••">
-
-          <button type="submit" class="primary" id="auth-submit-btn">Logi sisse</button>
-        </form>
-
-        <div class="auth-toggle">
-          <span id="auth-toggle-text">Pole kontot?</span>
-          <button type="button" onclick="toggleAuthMode()" id="auth-toggle-btn">Loo konto</button>
-        </div>
-      </div>
-
-      <!-- File Manager (Shown when logged in) -->
-      <div id="file-manager-container" class="card" style="display: none;">
-        <div class="brand">
-          <div class="brand-icon">📁</div>
+          <div class="brand-icon">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 19V6M5 12l7-7 7 7"/></svg>
+          </div>
           <h1>Minu Failid</h1>
         </div>
-        <p class="sub">Lae faile üles või lae alla</p>
-
-        <input type="file" id="file-input" onchange="uploadSelectedFile(event)">
-        <div class="dropzone" onclick="document.getElementById('file-input').click()">
-          <div class="dz-title">Klõpsa siia faili valimiseks</div>
-          <div class="dz-sub">või lohista fail siia</div>
-        </div>
-
-        <div class="file-list" id="file-list"></div>
-
-        <button class="primary" style="margin-top: 24px; background: var(--muted);" onclick="handleLogout()">Logi välja</button>
+        <p class="sub">Setupi esimest korda konto</p>
+        <label for="setup-passcode">Parool</label>
+        <input type="password" id="setup-passcode" placeholder="Something only you know">
+        <label for="setup-token">Pane enda GitHub token (ühekorra)</label>
+        <input type="password" id="setup-token" placeholder="github_pat_...">
+        <p class="hint">GitHubi tokenit peab ainult sisestama ühekorra.</p>
+        <button class="primary" id="setup-save">Save &amp; continue</button>
       </div>
 
-    </section>
-  </div>
+      <div id="login-view">
+        <div class="brand">
+          <div class="brand-icon">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="10" width="16" height="10" rx="2"/><path d="M8 10V7a4 4 0 018 0v3"/></svg>
+          </div>
+          <h1>Minu Failid</h1>
+        </div>
+        <p class="sub">Sisesta parool sisenemiseks</p>
+        <div id="login-error">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+          Vale parool, proovi uuesti.
+        </div>
+        <input type="password" id="login-passcode" placeholder="Passcode">
+        <button class="primary" id="login-unlock">Tee lahti</button>
+      </div>
+
+      <div id="app-view">
+        <div class="brand">
+          <div class="brand-icon">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 19V6M5 12l7-7 7 7"/></svg>
+          </div>
+          <h1>Minu Failid</h1>
+        </div>
+        <p class="sub">Lae ühest ülesse, teisest alla</p>
+
+        <input type="file" id="file-input">
+        <div class="dropzone" id="dropzone">
+          <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+          <div class="dz-title">Viska fail siia</div>
+          <div class="dz-sub">või vajuta valimiseks</div>
+        </div>
+        <div id="upload-status" class="toast"></div>
+
+        <div class="file-list" id="file-list"></div>
+        <div id="empty-state">
+          <svg width="34" height="34" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><polyline points="22 12 16 12 14 15 10 15 8 12 2 12"/><path d="M5.45 5.11L2 12v6a2 2 0 002 2h16a2 2 0 002-2v-6l-3.45-6.89A2 2 0 0016.76 4H7.24a2 2 0 00-1.79 1.11z"/></svg>
+          <div class="es-title">Siin pole hetkel midagi</div>
+          <div class="es-sub">Lisa fail, et alustada</div>
+        </div>
+
+        <button class="forget-link" id="forget-device">Unusta see seade</button>
+      </div>
+
+    </div>
+  </section>
 
 </main>
 
 <footer class="footer">
-  <p>Võta ühendust minuga Instagramis <a href="https://www.instagram.com/ekuvend/">"ekuvend"</a></p>
+  <p>Võta ühendust minuga instagrammis <a href="https://www.instagram.com/ekuvend/">"ekuvend"</a></p>
 </footer>
 
 <script>
-  // 1. SUPABASE CONFIGURATION
-  // Replace these credentials with your project details from https://supabase.com
-  const SUPABASE_URL = "https://mktbiiypppgeksowmhmi.supabase.co/rest/v1/";
-  const SUPABASE_ANON_KEY = "sb_secret_95Ygmxh-sdhK1FeWAhdgew_dgi9Mu9i";
-  
-  const supabase = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+  const OWNER = 'ekuvend';
+  const REPO = 'html';
+  const FOLDER = 'files';
 
-  let isSignUpMode = false;
+  const dropzone = document.getElementById('dropzone');
+  const fileInput = document.getElementById('file-input');
+  const uploadStatus = document.getElementById('upload-status');
+  const fileList = document.getElementById('file-list');
+  const emptyState = document.getElementById('empty-state');
 
-  // 2. PAGE NAVIGATION LOGIC
-  function navigateTo(pageId) {
-    document.querySelectorAll('.page-view').forEach(view => view.classList.remove('active'));
-    const targetPage = document.getElementById(`page-${pageId}`);
-    if (targetPage) targetPage.classList.add('active');
-  }
-
-  // 3. AUTHENTICATION LOGIC
-  function toggleAuthMode() {
-    isSignUpMode = !isSignUpMode;
-    document.getElementById('auth-title').textContent = isSignUpMode ? 'Loo konto' : 'Logi sisse';
-    document.getElementById('auth-sub').textContent = isSignUpMode ? 'Registreeri uus kasutaja' : 'Sisesta oma andmed failidele ligipääsuks';
-    document.getElementById('auth-submit-btn').textContent = isSignUpMode ? 'Registreeru' : 'Logi sisse';
-    document.getElementById('auth-toggle-text').textContent = isSignUpMode ? 'Konto olemas?' : 'Pole kontot?';
-    document.getElementById('auth-toggle-btn').textContent = isSignUpMode ? 'Logi sisse' : 'Loo konto';
-  }
-
-  async function handleAuth(event) {
-    event.preventDefault();
-    const email = document.getElementById('auth-email').value;
-    const password = document.getElementById('auth-password').value;
-
-    if (isSignUpMode) {
-      const { data, error } = await supabase.auth.signUp({ email, password });
-      if (error) alert('Registreerimise viga: ' + error.message);
-      else alert('Konto loodud! Kontrolli oma e-posti kinnitamiseks.');
-    } else {
-      const { data, error } = await supabase.auth.signInWithPassword({ email, password });
-      if (error) alert('Sisselogimise viga: ' + error.message);
-      else checkSession();
-    }
-  }
-
-  async function handleLogout() {
-    await supabase.auth.signOut();
-    checkSession();
-  }
-
-  async function checkSession() {
-    const { data: { session } } = await supabase.auth.getSession();
-    const authContainer = document.getElementById('auth-container');
-    const fileContainer = document.getElementById('file-manager-container');
-
-    if (session) {
-      authContainer.style.display = 'none';
-      fileContainer.style.display = 'block';
-      loadUserFiles();
-    } else {
-      authContainer.style.display = 'block';
-      fileContainer.style.display = 'none';
-    }
-  }
-
-  // 4. FILE STORAGE LOGIC
-  async function uploadSelectedFile(event) {
-    const file = event.target.files[0];
-    if (!file) return;
-
-    const { data: { user } } = await supabase.auth.getUser();
-    if (!user) return alert("Pead olema sisse logitud!");
-
-    const filePath = `${user.id}/${Date.now()}_${file.name}`;
-    const { error } = await supabase.storage.from('user-files').upload(filePath, file);
-
-    if (error) {
-      alert('Upload ebaõnnestus: ' + error.message);
-    } else {
-      alert('Fail edukalt üles laetud!');
-      loadUserFiles();
-    }
-  }
-
-  async function loadUserFiles() {
-    const { data: { user } } = await supabase.auth.getUser();
-    if (!user) return;
-
-    const { data, error } = await supabase.storage.from('user-files').list(user.id);
-    const fileListEl = document.getElementById('file-list');
-    fileListEl.innerHTML = '';
-
-    if (error || !data || data.length === 0) {
-      fileListEl.innerHTML = '<p style="color: var(--muted); font-size: 13px;">Failid puuduvad.</p>';
-      return;
-    }
-
-    data.forEach(file => {
-      const row = document.createElement('div');
-      row.className = 'file-row';
-      row.innerHTML = `
-        <div class="file-info">
-          <div class="file-name">${file.name.replace(/^\d+_/, '')}</div>
-        </div>
-      `;
-      fileListEl.appendChild(row);
+  function showView(view) {
+    ['setup-view', 'login-view', 'app-view'].forEach(id => {
+      const el = document.getElementById(id);
+      if (id === view) {
+        el.style.display = 'block';
+        el.classList.remove('animate-in');
+        void el.offsetWidth;
+        el.classList.add('animate-in');
+      } else {
+        el.style.display = 'none';
+      }
     });
   }
 
-  // Initial Check on Page Load
-  supabase.auth.onAuthStateChange(() => checkSession());
-  checkSession();
+  function init() {
+    const hasToken = localStorage.getItem('gh_token');
+    const hasPasscode = localStorage.getItem('gh_passcode');
+    showView((!hasToken || !hasPasscode) ? 'setup-view' : 'login-view');
+  }
+
+  document.getElementById('setup-save').addEventListener('click', () => {
+    const passcode = document.getElementById('setup-passcode').value.trim();
+    const token = document.getElementById('setup-token').value.trim();
+    if (!passcode || !token) { alert('Fill in both fields.'); return; }
+    localStorage.setItem('gh_passcode', passcode);
+    localStorage.setItem('gh_token', token);
+    showView('app-view');
+    loadFiles();
+  });
+
+  document.getElementById('login-unlock').addEventListener('click', () => {
+    const entered = document.getElementById('login-passcode').value.trim();
+    const errorBox = document.getElementById('login-error');
+    if (entered && entered === localStorage.getItem('gh_passcode')) {
+      errorBox.style.display = 'none';
+      showView('app-view');
+      loadFiles();
+    } else {
+      errorBox.style.display = 'flex';
+    }
+  });
+
+  document.getElementById('forget-device').addEventListener('click', () => {
+    if (confirm('Forget this device? You will need your GitHub token again next time.')) {
+      localStorage.clear();
+      location.reload();
+    }
+  });
+
+  dropzone.addEventListener('click', () => fileInput.click());
+  dropzone.addEventListener('dragover', e => { e.preventDefault(); dropzone.classList.add('drag'); });
+  dropzone.addEventListener('dragleave', () => dropzone.classList.remove('drag'));
+  dropzone.addEventListener('drop', e => {
+    e.preventDefault();
+    dropzone.classList.remove('drag');
+    if (e.dataTransfer.files.length) uploadFile(e.dataTransfer.files[0]);
+  });
+  fileInput.addEventListener('change', () => {
+    if (fileInput.files.length) uploadFile(fileInput.files[0]);
+  });
+
+  function showStatus(msg, type) {
+    uploadStatus.textContent = msg;
+    uploadStatus.className = 'toast' + (type === 'error' ? ' toast-error' : '');
+    uploadStatus.style.display = 'flex';
+    uploadStatus.classList.remove('animate');
+    void uploadStatus.offsetWidth;
+    uploadStatus.classList.add('animate');
+  }
+
+  function uploadFile(file) {
+    const token = localStorage.getItem('gh_token');
+    if (!token) { showStatus('No token saved on this device.', 'error'); return; }
+    if (file.size > 20 * 1024 * 1024) { showStatus('File is too big for this (keep it under ~20MB).', 'error'); return; }
+
+    showStatus(`Uploading ${file.name}...`);
+    const reader = new FileReader();
+    reader.onload = () => {
+      const base64 = reader.result.split(',')[1];
+      const path = `${FOLDER}/${Date.now()}_${file.name}`;
+      fetch(`https://api.github.com/repos/${OWNER}/${REPO}/contents/${path}`, {
+        method: 'PUT',
+        headers: {
+          'Authorization': `token ${token}`,
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ message: `Upload ${file.name}`, content: base64 })
+      }).then(res => {
+        if (!res.ok) return res.json().then(d => { throw new Error(d.message || 'Upload failed'); });
+        showStatus(`Uploaded ${file.name}`);
+        fileInput.value = '';
+        setTimeout(() => { uploadStatus.style.display = 'none'; }, 2200);
+        loadFiles();
+      }).catch(err => showStatus('Upload failed: ' + err.message, 'error'));
+    };
+    reader.readAsDataURL(file);
+  }
+
+  function formatSize(bytes) {
+    if (bytes < 1024) return bytes + ' B';
+    if (bytes < 1024 * 1024) return (bytes / 1024).toFixed(1) + ' KB';
+    return (bytes / (1024 * 1024)).toFixed(1) + ' MB';
+  }
+
+  function loadFiles() {
+    fetch(`https://api.github.com/repos/${OWNER}/${REPO}/contents/${FOLDER}`)
+      .then(res => res.ok ? res.json() : [])
+      .then(items => {
+        fileList.innerHTML = '';
+        if (!Array.isArray(items) || !items.length) { emptyState.style.display = 'flex'; return; }
+        emptyState.style.display = 'none';
+        items.slice().reverse().forEach(item => {
+          const displayName = item.name.replace(/^\d+_/, '');
+          const row = document.createElement('div');
+          row.className = 'file-row';
+          row.innerHTML = `
+            <div class="file-icon">
+              <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+            </div>
+            <div class="file-info">
+              <div class="file-name">${displayName}</div>
+              <div class="file-size">${formatSize(item.size)}</div>
+            </div>
+            <div class="file-actions">
+              <a class="icon-btn" href="${item.download_url}" download="${displayName}" target="_blank" rel="noopener" title="Download">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+              </a>
+              <button class="icon-btn danger" data-path="${item.path}" data-sha="${item.sha}" title="Delete">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 01-2 2H8a2 2 0 01-2-2L5 6"/><path d="M10 11v6"/><path d="M14 11v6"/></svg>
+              </button>
+            </div>
+          `;
+          row.querySelector('button').addEventListener('click', e => {
+            const btn = e.target.closest('button');
+            deleteFile(btn.dataset.path, btn.dataset.sha);
+          });
+          fileList.appendChild(row);
+        });
+      });
+  }
+
+  function deleteFile(path, sha) {
+    const token = localStorage.getItem('gh_token');
+    if (!token) { showStatus('No token saved on this device.', 'error'); return; }
+    fetch(`https://api.github.com/repos/${OWNER}/${REPO}/contents/${path}`, {
+      method: 'DELETE',
+      headers: {
+        'Authorization': `token ${token}`,
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({ message: `Delete ${path}`, sha })
+    }).then(loadFiles);
+  }
+
+  init();
 </script>
 </body>
 </html>
