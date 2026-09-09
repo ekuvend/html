@@ -16,6 +16,9 @@
 </head>
 <body>
 
+<!-- Taustapilt (Udune Passat) -->
+<div class="bg-image"></div>
+
 <header class="topnav">
   <div class="topnav-inner">
     <a href="#home" class="brand-name">E.P</a>
@@ -23,6 +26,16 @@
       <a href="#home">Minust</a>
       <a href="#projects">Projektid</a>
       <a href="#files">Failid</a>
+      
+      <!-- Sotsiaalmeedia ikoonid navi lõpus -->
+      <div class="social-links">
+        <a href="https://www.instagram.com/ekuvend/" target="_blank" aria-label="Instagram" class="social-icon">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="2" width="20" height="20" rx="5" ry="5"></rect><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"></path><line x1="17.5" y1="6.5" x2="17.51" y2="6.5"></line></svg>
+        </a>
+        <a href="https://www.tiktok.com/@ekuvend" target="_blank" aria-label="TikTok" class="social-icon">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M19.589 6.686a4.793 4.793 0 0 1-3.77-4.245V2h-3.445v13.672a2.896 2.896 0 0 1-5.201 1.743l-.002-.001a2.895 2.895 0 0 1 3.183-4.51v-3.5a6.329 6.329 0 0 0-5.394 1.83 6.338 6.338 0 0 0 8.86 8.972 6.331 6.331 0 0 0 2.05-4.595V8.84a8.212 8.212 0 0 0 4.719 1.488V6.883a4.793 4.793 0 0 1-1.000-.197z"/></svg>
+        </a>
+      </div>
     </nav>
   </div>
 </header>
@@ -31,15 +44,17 @@
 
   <!-- Home / About Page View -->
   <div id="page-home" class="page-view active">
-    <section class="section hero">
-      <div class="hero-badge">🚘 Passat B5 1.8T Syncro</div>
-      <h1 class="hero-name">E.P</h1>
-      <p class="hero-tagline">Annelinnas tuntud kui "kohalik tuuner"</p>
-      <p class="hero-bio">1998. aasta Passat B5 Syncro, mille sain vennalt sünnipäevakingiks, et auto ehitamist omal käel praktikas selgeks õppida.</p>
-    </section>
+    <!-- Keskne tekstimull/konteiner -->
+    <div class="content-bubble">
+      
+      <section class="hero">
+        <div class="hero-badge">🚘 Passat B5 1.8T Syncro</div>
+        <h1 class="hero-name">E.P</h1>
+        <p class="hero-tagline">Annelinnas tuntud kui "kohalik tuuner"</p>
+        <p class="hero-bio">1998. aasta Passat B5 Syncro, mille sain vennalt sünnipäevakingiks, et auto ehitamist omal käel praktikas selgeks õppida.</p>
+      </section>
 
-    <section class="section" style="padding-top: 0;">
-      <!-- Quick Specs Grid -->
+      <!-- Tehnilised andmed -->
       <div class="stats-grid">
         <div class="stat-card">
           <span class="stat-label">Väljalaskeaasta</span>
@@ -59,59 +74,63 @@
         </div>
       </div>
 
-      <!-- Descriptive Info Cards -->
+      <!-- 3 Info-kaarti kõrvuti -->
       <div class="info-grid">
         <div class="info-card">
           <div class="info-icon">🛠️</div>
           <h3>Projekti taust</h3>
-          <p>Sain selle auto vennalt kingituseks ühe konkreetse eesmärgiga - õppida autode ehitamist + hooldamist, tehes endale esimest autot</p>
+          <p>Sain selle auto vennalt kingituseks ühe konkreetse eesmärgiga - õppida autode ehitamist + hooldamist, tehes endale esimest autot.</p>
         </div>
         <div class="info-card">
           <div class="info-icon">⚡</div>
           <h3>Hetkel tehtud</h3>
-          <p>Täispauk pidurisüsteem uus ette ja taha. Tagumine vedrustus tutikas, väljalaskesüsteem täielik handmade, 3" otsetoru katalüsaatoriga</p>
+          <p>Täispauk pidurisüsteem uus ette ja taha. Tagumine vedrustus tutikas, väljalaskesüsteem täielik handmade 3" otsetoru katalüsaatoriga.</p>
+        </div>
+        <div class="info-card">
+          <div class="info-icon">🚀</div>
+          <h3>Tulevikuplaanid</h3>
+          <p>Kere täielik roostetõrje ja värvimine, vahejahuti (FMIC) paigaldus ning edaspidi veelgi võimsam turbo lahendus.</p>
         </div>
       </div>
-    </section>
+
+    </div>
   </div>
 
   <!-- Projects Page View -->
   <div id="page-projects" class="page-view">
-    <section class="section">
-      <h2 class="section-title">Projektid</h2>
-      <p class="section-sub">Paar asja mille üle uhke olen</p>
+    <div class="content-bubble">
+      <section>
+        <h2 class="section-title">Projektid</h2>
+        <p class="section-sub">Paar asja mille üle uhke olen</p>
 
-      <div class="project-grid">
+        <div class="project-grid">
+          <article class="project-card">
+            <span class="tag tag-a">Tehtud</span>
+            <h3>Väljalaske süsteem</h3>
+            <p>Katalüsaatorist kuni lõpupütini handmade kõik.</p>
+          </article>
 
-        <!-- Olemasolev projekt lingiga -->
-        <article class="project-card">
-          <span class="tag tag-a">Tehtud</span>
-          <h3>Väljalaske süsteem</h3>
-          <p>Katalüsaatorist kuni lõpupütini handmade kõik.</p>
-        </article>
+          <article class="project-card">
+            <span class="tag tag-a">Tehtud</span>
+            <h3>Chippimine</h3>
+            <p>Stage 1 - Pole mingi põlvepeal tehtud chip, originaalse turboga surub hetkel 1.4 bar ja on lisatud ka palju muid asju chipis.</p>
+          </article>
 
-        <article class="project-card">
-          <span class="tag tag-a">Tehtud</span>
-          <h3>Chippimine</h3>
-          <p>Stage 1 - Pole mingi põlvepeal tehtud chip, originaalse turboga surub hetkel 1.4 bar ja on lisatud ka palju muid asju chipis</p>
-        </article>
-
-        <!-- UUS PROJEKT 2 -->
-        <article class="project-card">
-          <span class="tag tag-a">Töös</span>
-          <h3>Roostega tegelemine</h3>
-          <p>Esitiivas roosteauk, tagatiivad ja pmst kõik uksed vaja roostest korda teha</p>
-        </article>
-
-      </div>
-    </section>
+          <article class="project-card">
+            <span class="tag tag-a">Töös</span>
+            <h3>Roostega tegelemine</h3>
+            <p>Esitiivas roosteauk, tagatiivad ja pmst kõik uksed vaja roostest korda teha.</p>
+          </article>
+        </div>
+      </section>
+    </div>
   </div>
 
-  <!-- Separate Files Page View -->
+  <!-- Files Page View -->
   <div id="page-files" class="page-view">
     <section class="section">
 
-      <!-- Auth Form (Shown when logged out) -->
+      <!-- Auth Form -->
       <div id="auth-container" class="card">
         <div class="brand">
           <div class="brand-icon">🔑</div>
@@ -140,7 +159,7 @@
         </div>
       </div>
 
-      <!-- File Manager (Shown when logged in) -->
+      <!-- File Manager -->
       <div id="file-manager-container" class="card" style="display: none;">
         <div class="brand">
           <div class="brand-icon">📁</div>
@@ -165,7 +184,7 @@
 </main>
 
 <footer class="footer">
-  <p>Võta ühendust minuga Instagramis <a href="https://www.instagram.com/ekuvend/" target="_blank">"ekuvend"</a></p>
+  <p>© 1998 Passat B5 Syncro</p>
 </footer>
 
 <!-- Skriptifail -->
