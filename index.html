@@ -375,30 +375,60 @@ const sb = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
     }
   }
 
-  async function loadUserFiles() {
-    const { data: { user } } = await sb.auth.getUser();
-    if (!user) return;
+  // Updated File List Loader with Download Action
+async function loadUserFiles() {
+  const { data: { user } } = await sb.auth.getUser();
+  if (!user) return;
 
-    const { data, error } = await sb.storage.from('user-files').list(user.id);
-    const fileListEl = document.getElementById('file-list');
-    fileListEl.innerHTML = '';
+  const { data, error } = await sb.storage.from('user-files').list(user.id);
+  const fileListEl = document.getElementById('file-list');
+  fileListEl.innerHTML = '';
 
-    if (error || !data || data.length === 0) {
-      fileListEl.innerHTML = '<p style="color: var(--muted); font-size: 13px;">Failid puuduvad.</p>';
-      return;
-    }
-
-    data.forEach(file => {
-      const row = document.createElement('div');
-      row.className = 'file-row';
-      row.innerHTML = `
-        <div class="file-info">
-          <div class="file-name">${file.name.replace(/^\d+_/, '')}</div>
-        </div>
-      `;
-      fileListEl.appendChild(row);
-    });
+  if (error || !data || data.length === 0) {
+    fileListEl.innerHTML = '<p style="color: var(--muted); font-size: 13px;">Failid puuduvad.</p>';
+    return;
   }
+
+  data.forEach(file => {
+    const filePath = `${user.id}/${file.name}`;
+    const cleanFileName = file.name.replace(/^\d+_/, '');
+
+    const row = document.createElement('div');
+    row.className = 'file-row';
+    row.style.cssText = 'display: flex; justify-content: space-between; align-items: center; width: 100%;';
+    row.innerHTML = `
+      <div class="file-info">
+        <div class="file-name">${cleanFileName}</div>
+      </div>
+      <button 
+        type="button" 
+        onclick="downloadFile('${filePath}', '${cleanFileName}')" 
+        style="background: none; border: none; color: var(--accent); font-weight: 600; cursor: pointer; font-size: 13px;">
+        Lae alla
+      </button>
+    `;
+    fileListEl.appendChild(row);
+  });
+}
+
+// Helper Function to Trigger File Downloads
+async function downloadFile(filePath, fileName) {
+  const { data, error } = await sb.storage.from('user-files').download(filePath);
+  
+  if (error) {
+    alert('Allalaadimise viga: ' + error.message);
+    return;
+  }
+
+  const blobUrl = URL.createObjectURL(data);
+  const anchor = document.createElement('a');
+  anchor.href = blobUrl;
+  anchor.download = fileName;
+  document.body.appendChild(anchor);
+  anchor.click();
+  anchor.remove();
+  URL.revokeObjectURL(blobUrl);
+}
 
   // Monitor Authentication State
   sb.auth.onAuthStateChange(() => checkSession());
