@@ -96,8 +96,6 @@
     margin-bottom: 12px;
   }
   .tag-a { background: var(--accent-soft); color: var(--accent-dark); }
-  .tag-b { background: var(--teal-soft); color: var(--teal-dark); }
-  .tag-c { background: var(--danger-soft); color: var(--coral-dark); }
   .project-card h3 { font-size: 15.5px; font-weight: 700; margin: 0 0 6px; }
   .project-card p { font-size: 13.5px; color: var(--muted); line-height: 1.6; margin: 0 0 14px; }
   .project-link { font-size: 13px; font-weight: 600; color: var(--accent); text-decoration: none; }
@@ -137,6 +135,28 @@
     transition: border-color .15s ease;
   }
   input:focus { outline: none; border-color: var(--accent); }
+
+  /* Checkbox Styling */
+  .checkbox-group {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 18px;
+  }
+  .checkbox-group input[type="checkbox"] {
+    width: 16px;
+    height: 16px;
+    margin: 0;
+    accent-color: var(--accent);
+    cursor: pointer;
+  }
+  .checkbox-group label {
+    margin: 0;
+    font-size: 13px;
+    font-weight: 500;
+    color: var(--muted);
+    cursor: pointer;
+  }
   
   button.primary {
     width: 100%;
@@ -176,11 +196,26 @@
   #file-input { display: none; }
   
   .file-list { margin-top: 16px; }
-  .file-row {
-    display: flex; align-items: center; gap: 12px; padding: 10px 8px; border-radius: 14px;
+
+  /* Download Button */
+  .btn-download {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    background: var(--accent-soft);
+    color: var(--accent-dark);
+    border: none;
+    padding: 8px 14px;
+    border-radius: 10px;
+    font-size: 13px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.15s ease;
   }
-  .file-info { flex: 1; min-width: 0; }
-  .file-name { font-weight: 600; font-size: 13.5px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .btn-download:hover {
+    background: var(--accent);
+    color: #ffffff;
+  }
 
   /* ---------- Footer ---------- */
   .footer { text-align: center; padding: 40px 24px; color: var(--muted); font-size: 13px; border-top: 1px solid var(--border); margin-top: 40px; }
@@ -246,6 +281,11 @@
           <label for="auth-password">Parool</label>
           <input type="password" id="auth-password" required placeholder="••••••••">
 
+          <div class="checkbox-group">
+            <input type="checkbox" id="remember-me" checked>
+            <label for="remember-me">Jää sisse</label>
+          </div>
+
           <button type="submit" class="primary" id="auth-submit-btn">Logi sisse</button>
         </form>
 
@@ -284,10 +324,12 @@
 </footer>
 
 <script>
-const SUPABASE_URL = "https://mktbiiypppgeksowmhmi.supabase.co";
-const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im1rdGJpaXlwcHBnZWtzb3dtaG1pIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODg5NjM4MzUsImV4cCI6MjEwNDUzOTgzNX0.Rsy9WGGaidMv4zfFvdDUJeJRdcrnVaQuEtG5TiIqaaw";
+  // 1. SUPABASE CONFIGURATION
+  const SUPABASE_URL = "https://mktbiiypppgeksowmhmi.supabase.co";
+  const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im1rdGJpaXlwcHBnZWtzb3dtaG1pIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODg5NjM4MzUsImV4cCI6MjEwNDUzOTgzNX0.Rsy9WGGaidMv4zfFvdDUJeJRdcrnVaQuEtG5TiIqaaw";
 
-const sb = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+  // Single client instance initialized using 'sb' to prevent library variable collisions
+  const sb = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
   let isSignUpMode = false;
 
@@ -324,6 +366,7 @@ const sb = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
     event.preventDefault();
     const email = document.getElementById('auth-email').value;
     const password = document.getElementById('auth-password').value;
+    const rememberMe = document.getElementById('remember-me').checked;
 
     if (isSignUpMode) {
       const { data, error } = await sb.auth.signUp({ email, password });
@@ -331,17 +374,31 @@ const sb = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
       else alert('Konto loodud! Kontrolli oma e-posti kinnitamiseks.');
     } else {
       const { data, error } = await sb.auth.signInWithPassword({ email, password });
-      if (error) alert('Sisselogimise viga: ' + error.message);
-      else checkSession();
+      if (error) {
+        alert('Sisselogimise viga: ' + error.message);
+      } else {
+        if (!rememberMe) {
+          sessionStorage.setItem('temp_session', 'true');
+        } else {
+          sessionStorage.removeItem('temp_session');
+        }
+        checkSession();
+      }
     }
   }
 
   async function handleLogout() {
+    sessionStorage.removeItem('temp_session');
     await sb.auth.signOut();
     checkSession();
   }
 
   async function checkSession() {
+    if (sessionStorage.getItem('temp_session') === 'true') {
+      sessionStorage.removeItem('temp_session');
+      await sb.auth.signOut();
+    }
+
     const { data: { session } } = await sb.auth.getSession();
     const authContainer = document.getElementById('auth-container');
     const fileContainer = document.getElementById('file-manager-container');
@@ -356,7 +413,7 @@ const sb = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
     }
   }
 
-  // 4. FILE STORAGE LOGIC
+  // 4. FILE STORAGE & DOWNLOAD LOGIC
   async function uploadSelectedFile(event) {
     const file = event.target.files[0];
     if (!file) return;
@@ -375,60 +432,59 @@ const sb = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
     }
   }
 
-  // Updated File List Loader with Download Action
-async function loadUserFiles() {
-  const { data: { user } } = await sb.auth.getUser();
-  if (!user) return;
+  async function loadUserFiles() {
+    const { data: { user } } = await sb.auth.getUser();
+    if (!user) return;
 
-  const { data, error } = await sb.storage.from('user-files').list(user.id);
-  const fileListEl = document.getElementById('file-list');
-  fileListEl.innerHTML = '';
+    const { data, error } = await sb.storage.from('user-files').list(user.id);
+    const fileListEl = document.getElementById('file-list');
+    fileListEl.innerHTML = '';
 
-  if (error || !data || data.length === 0) {
-    fileListEl.innerHTML = '<p style="color: var(--muted); font-size: 13px;">Failid puuduvad.</p>';
-    return;
+    if (error || !data || data.length === 0) {
+      fileListEl.innerHTML = '<p style="color: var(--muted); font-size: 13px;">Failid puuduvad.</p>';
+      return;
+    }
+
+    data.forEach(file => {
+      const filePath = `${user.id}/${file.name}`;
+      const cleanFileName = file.name.replace(/^\d+_/, '');
+
+      const row = document.createElement('div');
+      row.className = 'file-row';
+      row.style.cssText = 'display: flex; justify-content: space-between; align-items: center; width: 100%; padding: 8px 0; border-bottom: 1px solid var(--border);';
+      row.innerHTML = `
+        <div class="file-info" style="overflow: hidden; text-overflow: ellipsis; white-space: nowrap; max-width: 60%;">
+          <div class="file-name" style="font-weight: 600; font-size: 13.5px;">${cleanFileName}</div>
+        </div>
+        <button 
+          type="button" 
+          class="btn-download" 
+          onclick="downloadFile('${filePath}', '${cleanFileName}')">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+          Lae alla
+        </button>
+      `;
+      fileListEl.appendChild(row);
+    });
   }
 
-  data.forEach(file => {
-    const filePath = `${user.id}/${file.name}`;
-    const cleanFileName = file.name.replace(/^\d+_/, '');
+  async function downloadFile(filePath, fileName) {
+    const { data, error } = await sb.storage.from('user-files').download(filePath);
+    
+    if (error) {
+      alert('Allalaadimise viga: ' + error.message);
+      return;
+    }
 
-    const row = document.createElement('div');
-    row.className = 'file-row';
-    row.style.cssText = 'display: flex; justify-content: space-between; align-items: center; width: 100%;';
-    row.innerHTML = `
-      <div class="file-info">
-        <div class="file-name">${cleanFileName}</div>
-      </div>
-      <button 
-        type="button" 
-        onclick="downloadFile('${filePath}', '${cleanFileName}')" 
-        style="background: none; border: none; color: var(--accent); font-weight: 600; cursor: pointer; font-size: 13px;">
-        Lae alla
-      </button>
-    `;
-    fileListEl.appendChild(row);
-  });
-}
-
-// Helper Function to Trigger File Downloads
-async function downloadFile(filePath, fileName) {
-  const { data, error } = await sb.storage.from('user-files').download(filePath);
-  
-  if (error) {
-    alert('Allalaadimise viga: ' + error.message);
-    return;
+    const blobUrl = URL.createObjectURL(data);
+    const anchor = document.createElement('a');
+    anchor.href = blobUrl;
+    anchor.download = fileName;
+    document.body.appendChild(anchor);
+    anchor.click();
+    anchor.remove();
+    URL.revokeObjectURL(blobUrl);
   }
-
-  const blobUrl = URL.createObjectURL(data);
-  const anchor = document.createElement('a');
-  anchor.href = blobUrl;
-  anchor.download = fileName;
-  document.body.appendChild(anchor);
-  anchor.click();
-  anchor.remove();
-  URL.revokeObjectURL(blobUrl);
-}
 
   // Monitor Authentication State
   sb.auth.onAuthStateChange(() => checkSession());
