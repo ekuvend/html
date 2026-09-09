@@ -52,18 +52,15 @@
   }
   .brand-name { font-weight: 800; color: var(--ink); text-decoration: none; font-size: 15px; letter-spacing: -0.01em; cursor: pointer; }
   .nav-links { display: flex; gap: 22px; align-items: center; }
-  .nav-links a, .nav-links button { 
+  .nav-links a { 
     color: var(--muted); 
     text-decoration: none; 
     font-size: 14px; 
     font-weight: 500; 
     transition: color .15s ease; 
-    background: none;
-    border: none;
-    cursor: pointer;
     font-family: inherit;
   }
-  .nav-links a:hover, .nav-links button:hover { color: var(--accent); }
+  .nav-links a:hover { color: var(--accent); }
 
   /* ---------- Sections / Pages ---------- */
   .page-view { display: none; }
@@ -184,7 +181,6 @@
   }
   .file-info { flex: 1; min-width: 0; }
   .file-name { font-weight: 600; font-size: 13.5px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-  .file-size { color: var(--muted); font-size: 12px; }
 
   /* ---------- Footer ---------- */
   .footer { text-align: center; padding: 40px 24px; color: var(--muted); font-size: 13px; border-top: 1px solid var(--border); margin-top: 40px; }
@@ -195,11 +191,11 @@
 
 <header class="topnav">
   <div class="topnav-inner">
-    <a onclick="navigateTo('home')" class="brand-name">E.P</a>
+    <a href="#home" class="brand-name">E.P</a>
     <nav class="nav-links">
-      <button onclick="navigateTo('home')">Minust</button>
-      <button onclick="navigateTo('projects')">Projektid</button>
-      <button onclick="navigateTo('files')">Failid</button>
+      <a href="#home">Minust</a>
+      <a href="#projects">Projektid</a>
+      <a href="#files">Failid</a>
     </nav>
   </div>
 </header>
@@ -289,20 +285,32 @@
 
 <script>
   // 1. SUPABASE CONFIGURATION
-  // Replace these credentials with your project details from https://supabase.com
-  const SUPABASE_URL = "https://mktbiiypppgeksowmhmi.supabase.co/rest/v1/";
-  const SUPABASE_ANON_KEY = "sb_secret_95Ygmxh-sdhK1FeWAhdgew_dgi9Mu9i";
-  
-  const supabase = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+  const SUPABASE_URL = "https://YOUR_SUPABASE_PROJECT_ID.supabase.co";
+  const SUPABASE_ANON_KEY = "YOUR_SUPABASE_ANON_KEY";
+
+  // Client variable renamed to 'sb' to avoid collision with the global 'supabase' library
+  const sb = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
   let isSignUpMode = false;
 
-  // 2. PAGE NAVIGATION LOGIC
+  // 2. PAGE NAVIGATION & URL HASH HANDLING
   function navigateTo(pageId) {
     document.querySelectorAll('.page-view').forEach(view => view.classList.remove('active'));
     const targetPage = document.getElementById(`page-${pageId}`);
-    if (targetPage) targetPage.classList.add('active');
+    if (targetPage) {
+      targetPage.classList.add('active');
+    } else {
+      document.getElementById('page-home').classList.add('active');
+    }
   }
+
+  function handleHashChange() {
+    const hash = window.location.hash.replace('#', '') || 'home';
+    navigateTo(hash);
+  }
+
+  window.addEventListener('hashchange', handleHashChange);
+  window.addEventListener('load', handleHashChange);
 
   // 3. AUTHENTICATION LOGIC
   function toggleAuthMode() {
@@ -320,23 +328,23 @@
     const password = document.getElementById('auth-password').value;
 
     if (isSignUpMode) {
-      const { data, error } = await supabase.auth.signUp({ email, password });
+      const { data, error } = await sb.auth.signUp({ email, password });
       if (error) alert('Registreerimise viga: ' + error.message);
       else alert('Konto loodud! Kontrolli oma e-posti kinnitamiseks.');
     } else {
-      const { data, error } = await supabase.auth.signInWithPassword({ email, password });
+      const { data, error } = await sb.auth.signInWithPassword({ email, password });
       if (error) alert('Sisselogimise viga: ' + error.message);
       else checkSession();
     }
   }
 
   async function handleLogout() {
-    await supabase.auth.signOut();
+    await sb.auth.signOut();
     checkSession();
   }
 
   async function checkSession() {
-    const { data: { session } } = await supabase.auth.getSession();
+    const { data: { session } } = await sb.auth.getSession();
     const authContainer = document.getElementById('auth-container');
     const fileContainer = document.getElementById('file-manager-container');
 
@@ -355,11 +363,11 @@
     const file = event.target.files[0];
     if (!file) return;
 
-    const { data: { user } } = await supabase.auth.getUser();
+    const { data: { user } } = await sb.auth.getUser();
     if (!user) return alert("Pead olema sisse logitud!");
 
     const filePath = `${user.id}/${Date.now()}_${file.name}`;
-    const { error } = await supabase.storage.from('user-files').upload(filePath, file);
+    const { error } = await sb.storage.from('user-files').upload(filePath, file);
 
     if (error) {
       alert('Upload ebaõnnestus: ' + error.message);
@@ -370,10 +378,10 @@
   }
 
   async function loadUserFiles() {
-    const { data: { user } } = await supabase.auth.getUser();
+    const { data: { user } } = await sb.auth.getUser();
     if (!user) return;
 
-    const { data, error } = await supabase.storage.from('user-files').list(user.id);
+    const { data, error } = await sb.storage.from('user-files').list(user.id);
     const fileListEl = document.getElementById('file-list');
     fileListEl.innerHTML = '';
 
@@ -394,9 +402,8 @@
     });
   }
 
-  // Initial Check on Page Load
-  supabase.auth.onAuthStateChange(() => checkSession());
-  checkSession();
+  // Monitor Authentication State
+  sb.auth.onAuthStateChange(() => checkSession());
 </script>
 </body>
 </html>
