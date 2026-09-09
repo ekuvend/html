@@ -328,7 +328,6 @@
   const SUPABASE_URL = "https://mktbiiypppgeksowmhmi.supabase.co";
   const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im1rdGJpaXlwcHBnZWtzb3dtaG1pIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODg5NjM4MzUsImV4cCI6MjEwNDUzOTgzNX0.Rsy9WGGaidMv4zfFvdDUJeJRdcrnVaQuEtG5TiIqaaw";
 
-  // Single client instance initialized using 'sb' to prevent library variable collisions
   const sb = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
   let isSignUpMode = false;
@@ -378,9 +377,11 @@
         alert('Sisselogimise viga: ' + error.message);
       } else {
         if (!rememberMe) {
-          sessionStorage.setItem('temp_session', 'true');
+          localStorage.setItem('is_temp_session', 'true');
+          sessionStorage.setItem('active_tab', 'true');
         } else {
-          sessionStorage.removeItem('temp_session');
+          localStorage.removeItem('is_temp_session');
+          sessionStorage.removeItem('active_tab');
         }
         checkSession();
       }
@@ -388,14 +389,19 @@
   }
 
   async function handleLogout() {
-    sessionStorage.removeItem('temp_session');
+    localStorage.removeItem('is_temp_session');
+    sessionStorage.removeItem('active_tab');
     await sb.auth.signOut();
     checkSession();
   }
 
   async function checkSession() {
-    if (sessionStorage.getItem('temp_session') === 'true') {
-      sessionStorage.removeItem('temp_session');
+    // Check if the user logged in without "Jää sisse" and opened a new browser session/tab
+    const isTempSession = localStorage.getItem('is_temp_session') === 'true';
+    const hasActiveTab = sessionStorage.getItem('active_tab') === 'true';
+
+    if (isTempSession && !hasActiveTab) {
+      localStorage.removeItem('is_temp_session');
       await sb.auth.signOut();
     }
 
