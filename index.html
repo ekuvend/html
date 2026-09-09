@@ -21,11 +21,6 @@
     --accent: #4c3bcf;
     --accent-soft: #eeeafc;
     --accent-dark: #382cae;
-    --teal-soft: #e3f6f4;
-    --teal-dark: #0b7a6d;
-    --danger: #e2574c;
-    --danger-soft: #fdeceb;
-    --coral-dark: #b5382f;
     --border: #e6e5f2;
     --shadow-lg: 0 24px 48px -16px rgba(23,25,35,.18), 0 4px 12px rgba(23,25,35,.06);
   }
@@ -42,12 +37,12 @@
   /* ---------- Nav ---------- */
   .topnav {
     position: sticky; top: 0; z-index: 50;
-    background: rgba(255,255,255,.75);
-    backdrop-filter: blur(10px);
+    background: rgba(255,255,255,.8);
+    backdrop-filter: blur(12px);
     border-bottom: 1px solid var(--border);
   }
   .topnav-inner {
-    max-width: 760px; margin: 0 auto; padding: 14px 24px;
+    max-width: 820px; margin: 0 auto; padding: 14px 24px;
     display: flex; align-items: center; justify-content: space-between;
   }
   .brand-name { font-weight: 800; color: var(--ink); text-decoration: none; font-size: 15px; letter-spacing: -0.01em; cursor: pointer; }
@@ -66,16 +61,114 @@
   .page-view { display: none; }
   .page-view.active { display: block; }
 
-  .section { max-width: 720px; margin: 0 auto; padding: 56px 24px; }
-  .hero { text-align: center; padding-top: 72px; padding-bottom: 40px; }
-  .hero-name { font-size: clamp(32px, 5vw, 44px); font-weight: 800; letter-spacing: -0.02em; margin: 0 0 10px; }
-  .hero-tagline { font-size: 17px; font-weight: 500; margin: 0 auto 14px; max-width: 480px; }
-  .hero-bio { font-size: 15px; color: var(--muted); line-height: 1.7; margin: 0 auto; max-width: 480px; }
+  .section { max-width: 820px; margin: 0 auto; padding: 48px 24px; }
+  .hero { text-align: center; padding-top: 56px; padding-bottom: 32px; }
+  
+  .hero-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    background: var(--accent-soft);
+    color: var(--accent-dark);
+    font-size: 12.5px;
+    font-weight: 700;
+    padding: 6px 14px;
+    border-radius: 999px;
+    margin-bottom: 18px;
+  }
+  .hero-name { font-size: clamp(34px, 5vw, 48px); font-weight: 800; letter-spacing: -0.025em; margin: 0 0 10px; }
+  .hero-tagline { font-size: 18px; font-weight: 600; color: var(--ink); margin: 0 auto 12px; max-width: 520px; }
+  .hero-bio { font-size: 15px; color: var(--muted); line-height: 1.65; margin: 0 auto 28px; max-width: 500px; }
 
+  .hero-actions {
+    display: flex;
+    justify-content: center;
+    gap: 12px;
+  }
+  .btn-hero {
+    padding: 10px 22px;
+    border-radius: 12px;
+    font-size: 14px;
+    font-weight: 600;
+    text-decoration: none;
+    transition: all 0.15s ease;
+  }
+  .btn-hero.primary {
+    background: var(--accent);
+    color: #ffffff;
+  }
+  .btn-hero.primary:hover {
+    background: var(--accent-dark);
+  }
+  .btn-hero.secondary {
+    background: var(--surface);
+    color: var(--ink);
+    border: 1.5px solid var(--border);
+  }
+  .btn-hero.secondary:hover {
+    background: var(--bg-b);
+  }
+
+  /* ---------- Stats & Info Grids ---------- */
+  .stats-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+    gap: 14px;
+    margin-bottom: 28px;
+  }
+  .stat-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    padding: 18px 14px;
+    text-align: center;
+    box-shadow: 0 4px 12px rgba(23,25,35,.03);
+  }
+  .stat-label {
+    display: block;
+    font-size: 12px;
+    color: var(--muted);
+    font-weight: 500;
+    margin-bottom: 4px;
+  }
+  .stat-value {
+    font-size: 16px;
+    font-weight: 800;
+    color: var(--ink);
+  }
+
+  .info-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 20px;
+  }
+  .info-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 20px;
+    padding: 26px;
+    box-shadow: 0 10px 24px -16px rgba(23,25,35,.08);
+  }
+  .info-icon {
+    font-size: 26px;
+    margin-bottom: 12px;
+  }
+  .info-card h3 {
+    font-size: 16.5px;
+    font-weight: 700;
+    margin: 0 0 8px;
+  }
+  .info-card p {
+    font-size: 14px;
+    color: var(--muted);
+    line-height: 1.65;
+    margin: 0;
+  }
+
+  /* ---------- Projects ---------- */
   .section-title { font-size: 22px; font-weight: 800; letter-spacing: -0.01em; margin: 0 0 6px; }
   .section-sub { color: var(--muted); font-size: 14px; margin: 0 0 28px; }
 
-  /* ---------- Projects ---------- */
   .project-grid {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(210px, 1fr));
@@ -85,7 +178,8 @@
     background: var(--surface);
     border-radius: 16px;
     padding: 20px;
-    box-shadow: 0 10px 24px -16px rgba(23,25,35,.15);
+    border: 1px solid var(--border);
+    box-shadow: 0 10px 24px -16px rgba(23,25,35,.08);
   }
   .tag {
     display: inline-block;
@@ -104,12 +198,13 @@
   .card {
     width: 100%;
     max-width: 440px;
-    margin: 40px auto;
+    margin: 20px auto;
     background: var(--surface);
     border-radius: 22px;
     box-shadow: var(--shadow-lg);
     padding: 36px 32px;
     position: relative;
+    border: 1px solid var(--border);
   }
   .brand { display: flex; align-items: center; gap: 12px; margin-bottom: 4px; }
   .brand-icon {
@@ -219,7 +314,7 @@
 
   /* ---------- Footer ---------- */
   .footer { text-align: center; padding: 40px 24px; color: var(--muted); font-size: 13px; border-top: 1px solid var(--border); margin-top: 40px; }
-  .footer a { color: var(--accent); text-decoration: none; }
+  .footer a { color: var(--accent); text-decoration: none; font-weight: 600; }
 </style>
 </head>
 <body>
@@ -240,9 +335,51 @@
   <!-- Home / About Page View -->
   <div id="page-home" class="page-view active">
     <section class="section hero">
-      <h1 class="hero-name">E.P</h1>
-      <p class="hero-tagline">Passati niinimetatud "tuuner"</p>
-      <p class="hero-bio">1998 aasta passat, syncro, 1.8T, 5ne manuaalkäigukast. Läbisõit on teadmata, vennalt olin saanud selle kui sünnipäeva kingina, et saaksin selle pealt õppida autodest.</p>
+      <div class="hero-badge">🚘 Passat B5 1.8T Syncro Project</div>
+      <h1 class="hero-name">E.P Portfolio</h1>
+      <p class="hero-tagline">Autode ehitamine & mehhaanika õppimine nullist</p>
+      <p class="hero-bio">1998. aasta Passat B5 Syncro, mille sain vennalt sünnipäevakingiks, et auto ehitamist ja mehhaanikat omal käel praktikas selgeks õppida.</p>
+      
+      <div class="hero-actions">
+        <a href="#projects" class="btn-hero primary">Vaata projekte</a>
+        <a href="#files" class="btn-hero secondary">Minu failid</a>
+      </div>
+    </section>
+
+    <section class="section" style="padding-top: 0;">
+      <!-- Quick Specs Grid -->
+      <div class="stats-grid">
+        <div class="stat-card">
+          <span class="stat-label">Väljalaskeaasta</span>
+          <span class="stat-value">1998</span>
+        </div>
+        <div class="stat-card">
+          <span class="stat-label">Mootor</span>
+          <span class="stat-value">1.8T (Turbo)</span>
+        </div>
+        <div class="stat-card">
+          <span class="stat-label">Nelikvedu</span>
+          <span class="stat-value">Syncro</span>
+        </div>
+        <div class="stat-card">
+          <span class="stat-label">Käigukast</span>
+          <span class="stat-value">5-sp Manuaal</span>
+        </div>
+      </div>
+
+      <!-- Descriptive Info Cards -->
+      <div class="info-grid">
+        <div class="info-card">
+          <div class="info-icon">🛠️</div>
+          <h3>Projekti taust</h3>
+          <p>Sain selle auto vennalt kingituseks ühe konkreetse eesmärgiga: õppida omal käel autosid hooldama, parandama ja tuunima. Iga vahetatud detail ja teostatud töö on puhas praktika.</p>
+        </div>
+        <div class="info-card">
+          <div class="info-icon">⚡</div>
+          <h3>Praegused tööd</h3>
+          <p>Mootori ja veermiku korrastamine, kohandatud väljalaskesüsteemi ehitus ning pidev tehnilise seisukorra parandamine. Läbisõit on teadmata, aga ehitamine läheb täiel hool edasi!</p>
+        </div>
+      </div>
     </section>
   </div>
 
@@ -250,7 +387,7 @@
   <div id="page-projects" class="page-view">
     <section class="section">
       <h2 class="section-title">Projektid</h2>
-      <p class="section-sub">Paar asja milleüle uhke olen</p>
+      <p class="section-sub">Paar asja mille üle uhke olen</p>
       <div class="project-grid">
         <article class="project-card">
           <span class="tag tag-a">Tehtud</span>
@@ -320,13 +457,13 @@
 </main>
 
 <footer class="footer">
-  <p>Võta ühendust minuga Instagramis <a href="https://www.instagram.com/ekuvend/">"ekuvend"</a></p>
+  <p>Võta ühendust minuga Instagramis <a href="https://www.instagram.com/ekuvend/" target="_blank">"ekuvend"</a></p>
 </footer>
 
 <script>
   // 1. SUPABASE CONFIGURATION
   const SUPABASE_URL = "https://mktbiiypppgeksowmhmi.supabase.co";
-  const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im1rdGJpaXlwcHBnZWtzb3dtaG1pIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODg5NjM4MzUsImV4cCI6MjEwNDUzOTgzNX0.Rsy9WGGaidMv4zfFvdDUJeJRdcrnVaQuEtG5TiIqaaw";
+  const SUPABASE_ANON_KEY = "PASTE_YOUR_COPIED_ANON_KEY_HERE";
 
   const sb = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
@@ -396,7 +533,6 @@
   }
 
   async function checkSession() {
-    // Check if the user logged in without "Jää sisse" and opened a new browser session/tab
     const isTempSession = localStorage.getItem('is_temp_session') === 'true';
     const hasActiveTab = sessionStorage.getItem('active_tab') === 'true';
 
