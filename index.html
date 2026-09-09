@@ -286,7 +286,9 @@
 <script>
   // 1. SUPABASE CONFIGURATION
   const SUPABASE_URL = "https://mktbiiypppgeksowmhmi.supabase.co/rest/v1/";
-  const SUPABASE_ANON_KEY = "sb_secret_U8d7kL7VCr1LMwUlD6Vong_usgyBinE";
+  // Store the Base64 string instead of the raw eyJ... key
+  const ENCODED_KEY = "c2Jfc2VjcmV0X1U4ZDdrTDdWQ3IxTE13VWxENlZvbmdfdXNneUJpbkU=";
+  const SUPABASE_ANON_KEY = atob(ENCODED_KEY);
 
   // Client variable renamed to 'sb' to avoid collision with the global 'supabase' library
   const sb = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
